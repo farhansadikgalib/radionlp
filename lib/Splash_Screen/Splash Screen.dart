@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:radionlp/Check_Connection/No%20Internet.dart';
 import 'package:radionlp/Check_Connection/check_internet.dart';
 import 'package:radionlp/Home_Page/HomePage.dart';
+import 'package:radionlp/Page_Controller/Pages_With_Bottom_Navbar.dart';
+import 'package:radionlp/Push%20Notification/pushNotification.dart';
 
 
 class SplashScreenPage extends StatefulWidget {
@@ -17,12 +20,21 @@ class SplashScreenPage extends StatefulWidget {
 class _SplashScreenPageState extends State<SplashScreenPage>
     with TickerProviderStateMixin {
 
+  FirebaseNotifcation? firebase;
+  handleAsync() async {
+    await firebase!.initialize();
+    String? token = await firebase!.getToken();
+    print("Firebase token : $token");
+  }
 
   int checkInt = 0;
 
   @override
   void initState() {
     super.initState();
+    firebase = FirebaseNotifcation();
+    handleAsync();
+
     Future<int> a = CheckInternet().checkInternetConnection();
     a.then((value) {
       if (value == 0) {
@@ -42,19 +54,14 @@ class _SplashScreenPageState extends State<SplashScreenPage>
         setState(() {
           checkInt = 1;
         });
-        print('Internet connected');
         Timer(
-            Duration(seconds: 2),
+            Duration(seconds: 30),
                 () =>
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage(
-                        url: 'www.nlpradio.org')),
+                    MaterialPageRoute(builder: (context) => Nav_bar()),
                         (route) => false));
-        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //   content: Text('Connected to the internet'),
-        // )
-     //   );
+
       }
     });
   }
@@ -62,6 +69,9 @@ class _SplashScreenPageState extends State<SplashScreenPage>
 
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //     statusBarColor: Colors.white
+    // ));
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -82,8 +92,62 @@ class _SplashScreenPageState extends State<SplashScreenPage>
           Text("Radio NLP",
               style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Colors.black)),
           SizedBox(
-            height: 75,
+            height: 85,
           ),
+
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children:<Widget> [
+
+
+              SizedBox(width: 1,),
+
+              Container(
+                height: 70,
+                width: 100,
+                child: GlowButton(child: Text("Spanish",style: TextStyle(color: Colors.white),),color: Colors.black,glowColor: Colors.black54, onPressed: (){
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage(url: 'http://www.radiopnl.org/')),
+                          (route) => false);
+                }),
+              ),
+
+              Container(
+                height: 70,
+                width: 100,
+                child: GlowButton(child: Text("English",style: TextStyle(color: Colors.white),),color: Colors.black,glowColor: Colors.black54, onPressed: (){
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage(url: 'http://www.nlpradio.org/')),
+                          (route) => false);
+                }),
+              ),
+
+              Container(
+                height: 70,
+                width: 100,
+                child: GlowButton(child: Text("فارسی",style: TextStyle(color: Colors.white),),color: Colors.black,glowColor: Colors.black54, onPressed: (){
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage(url: 'http://www.radionlp.org/')),
+                          (route) => false);
+                }),
+
+              ),
+
+              SizedBox(width: 1,),
+
+
+
+            ],
+
+          ),
+
+
+          SizedBox(height: 60,),
 
           SpinKitSquareCircle(
             color: Colors.black,
@@ -93,10 +157,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
           ),
 
 
-          SizedBox(
-            height: 10,
-          ),
-          // _AnimatedLiquidLinearProgressIndicator(),
+
         ],
       ),
     );
